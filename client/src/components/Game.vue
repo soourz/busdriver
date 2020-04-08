@@ -1,6 +1,30 @@
 <template>
   <div id="game">
     GameMode: {{ gameMode }}
+    <div v-if="gameMode === 'preparing'">
+      preparing
+      <button @click="startGame">Start</button>
+    </div>
+    <div v-else-if="gameMode === 'colorPick'">
+      colorPick
+      <button @click="PickBlack">Black</button>
+      <button @click="PickRed">Red</button>
+    </div>
+    <div v-else-if="type === 'upperlowerPick'">
+      upperlowerPick
+      <button @click="PickUpper">Upper</button>
+      <button @click="PickLower">Lower</button>
+      <button @click="PickUpperLowerX">X</button>
+    </div>
+    <div v-else-if="type === 'innerouterPick'">
+      upperlowerPick
+      <button @click="PickOuter">Outer</button>
+      <button @click="PickInner">Inner</button>
+      <button @click="PickInnerOuterX">x</button>
+    </div>
+    <div v-else>
+      Error
+    </div>
     <div id="action"></div>
   </div>
 </template>
@@ -32,33 +56,10 @@ export default {
       await setTimeout(200)                                       //FIND ANOTHER SOLUTION FOR THIS SHIT
       var objDiv = document.getElementById("messages");
       objDiv.scrollTop = objDiv.scrollHeight;
-    },
-    gameMode: function(){
-
-    },
-    game: function(){
-      console.log('gamewatcher exec')
-      if (this.player === this.players[this.playersTurn]){
-        if(this.gameMode === 'colorPick'){
-          document.getElementById('action').innerHTML = '<button @click="PickBlack">Black</button><button @click="PickRed">Red</button>'
-        }else if(this.gameMode === 'upperlowerPick'){
-          document.getElementById('action').innerHTML = '<button @click="PickUpper">Upper</button><button @click="PickLower">Lower</button><button @click="PickUpperLowerX">X</button>'
-        }else if(this.gameMode === 'innerouterPick'){
-          document.getElementById('action').innerHTML = '<button @click="PickOuter">Outer</button><button @click="PickInner">Inner</button><button @click="PickInnerOuterX">x</button>'
-        }else if(this.gameMode === 'showResult'){
-          document.getElementById('action').innerHTML = 'result'
-        }else if(this.gameMode === 'preparing'){
-          document.getElementById('action').innerHTML = '<button @click="startGame">Start</button>'
-        }
-      }else if(this.gameMode === 'preparing'){
-        document.getElementById('action').innerHTML = '<button @click="startGame">Start</button>'
-      }else{
-        document.getElementById('action').innerHTML = this.game.players[this.game.playersTurn]
-      }
     }
   },
   methods: {
-    newMessage: (e) => {
+    newMessage: (e) => { //TODO set message ids for unique keys in the array
       e.preventDefault()
       let message = e.target.elements.message.value
       store.dispatch('sendMessage', message)
@@ -67,7 +68,9 @@ export default {
       store.dispatch('startGame')
     },
     PickBlack: () => {
+      console.log('1')
       store.dispatch('colorPick', {name: this.player, color: 'black'})
+      console.log('2')
     },
     PickRed: () => {
       store.dispatch('colorPick', {name: this.player, color: 'red'})

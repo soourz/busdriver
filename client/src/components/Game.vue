@@ -67,10 +67,8 @@ export default {
     startGame: () => {
       store.dispatch('startGame')
     },
-    PickBlack: () => {
-      console.log('1')
+    PickBlack: function(){
       store.dispatch('colorPick', {name: this.player, color: 'black'})
-      console.log('2')
     },
     PickRed: () => {
       store.dispatch('colorPick', {name: this.player, color: 'red'})

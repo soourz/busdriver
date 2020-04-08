@@ -1,0 +1,20 @@
+{
+  "name": "busdriver",
+  "version": "1.0.0",
+  "description": "A simple drinking game",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon server/index.js",
+    "start": "node server/index.js"
+  },
+  "author": "Felix Minzenmay",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.1",
+    "socket.io": "^2.3.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.2",
+    "ws": "3.3.2"
+  }
+}

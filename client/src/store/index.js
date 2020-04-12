@@ -40,6 +40,18 @@ export const store = new Vuex.Store({
       commit('NOTHING')                           // TODO how can i delete this nothing?
       this._vm.$socket.client.emit('startGame')
     },
+    spreadingCardsResp({commit}, data){
+      commit('NOTING')
+      this._vm.$socket.client.emit('spreadingCardsResp', data)
+    },
+    flippingCardsResp({commit}, data){
+      commit('NOTING')
+      this._vm.$socket.client.emit('flippingCardsResp', data)
+    },
+    drivingResp({commit}, data){
+      commit('NOTING')
+      this._vm.$socket.client.emit('drivingResp', data)
+    },
     colorPick({commit}, data){
       commit('NOTHING')  
       this._vm.$socket.client.emit('colorPick', data)
@@ -48,9 +60,9 @@ export const store = new Vuex.Store({
       commit('NOTHING')  
       this._vm.$socket.client.emit('upperlowerPick', data)
     },
-    innerOuterPick({commit}, data){
+    innerouterPick({commit}, data){
       commit('NOTHING')  
-      this._vm.$socket.client.emit('innerOuterPick', data)
+      this._vm.$socket.client.emit('innerouterPick', data)
     },
     socket_gameEntered({commit}, name){
       commit('UPDATE_PLAYER_NAME', name)

@@ -1,45 +1,91 @@
 <template>
   <div id="game">
+    <div id='mode'>
     GameMode: {{ gameMode }}
-    <div v-if="gameMode === 'preparing'">
+    </div>
+
+
+      <SpreadingCards v-if="gameMode === 'preparing'"></SpreadingCards>
+
+    <!-- <template v-if="gameMode === 'preparing'">
       preparing
       <button @click="startGame">Start</button>
-    </div>
-    <div v-else-if="gameMode === 'colorPick'">
-      colorPick
-      <button @click="PickBlack">Black</button>
-      <button @click="PickRed">Red</button>
-    </div>
-    <div v-else-if="type === 'upperlowerPick'">
+    </template>
+
+    <template v-else-if="gameMode === 'colorPick'">
+      ColorPick
+      <div v-if="players[playersTurn] === player">
+        <button @click="PickBlack">Black</button>
+        <button @click="PickRed">Red</button>
+      </div>
+      <div v-else>
+        Not your turn
+      </div>
+
+    </template>
+
+    <template v-else-if="gameMode === 'upperlowerPick'">
       upperlowerPick
-      <button @click="PickUpper">Upper</button>
-      <button @click="PickLower">Lower</button>
-      <button @click="PickUpperLowerX">X</button>
-    </div>
-    <div v-else-if="type === 'innerouterPick'">
-      upperlowerPick
+      <div v-if="players[playersTurn] === player">
+        <button @click="PickUpper">Upper</button>
+        <button @click="PickLower">Lower</button>
+        <button @click="PickUpperLowerX">X</button>
+      </div>
+      <div v-else>
+        Not your turn
+      </div>
+    </template>
+
+    <template v-else-if="gameMode === 'innerouterPick'">
+      innerouterpick
+      <div v-if="players[playersTurn] === player">
       <button @click="PickOuter">Outer</button>
       <button @click="PickInner">Inner</button>
       <button @click="PickInnerOuterX">x</button>
-    </div>
-    <div v-else>
+      </div>
+      <div v-else>
+        Not your turn
+      </div>
+    </template>
+
+    <template v-else-if="gameMode === 'flipping'">
+    </template>
+
+    <template v-else-if="gameMode === 'driving'">
+      driving
+      <div v-if="players[playersTurn] === player">
+      <button @click="PickOuter">Outer</button>
+      <button @click="PickInner">Inner</button>
+      <button @click="PickInnerOuterX">x</button>
+      </div>
+      <div v-else>
+        Not your turn
+      </div>
+    </template>
+
+    <template v-else>
       Error
-    </div>
+    </template> -->
+
     <div id="action"></div>
   </div>
 </template>
 
 <script>
 import {store} from '../store'
+import SpreadingCards from '@/components/SpreadingCards.vue'
 
 export default {
   name: 'Game',
+  components:{
+    SpreadingCards
+  },
   computed: {
     player(){
       return store.state.playerName
     },
     playersTurn(){
-      return store.state.game.players[store.state.game.playersTurn]
+      return store.state.game.playerTurn
     },
     cardsLeft(){
       return store.state.game.cardsLeft.length
@@ -70,25 +116,25 @@ export default {
     PickBlack: function(){
       store.dispatch('colorPick', {name: this.player, color: 'black'})
     },
-    PickRed: () => {
+    PickRed: function(){
       store.dispatch('colorPick', {name: this.player, color: 'red'})
     },
-    PickInner: () => {
+    PickInner: function(){
       store.dispatch('innerouterPick', {name: this.player, innerouter: 'inner'})
     },
-    PickOuter: () => {
+    PickOuter: function(){
       store.dispatch('innerouterPick', {name: this.player, innerouter: 'outer'})
     },
-    PickUpper: () => {
-      store.dispatch('innerouterPick', {name: this.player, upperlower: 'upper'})
+    PickUpper: function(){
+      store.dispatch('upperlowerPick', {name: this.player, upperlower: 'upper'})
     },
-    PickLower: () => {
+    PickLower: function(){
       store.dispatch('upperlowerPick', {name: this.player, upperlower: 'lower'})
     },
-    PickInnerOuterX: () => {
-      store.dispatch('upperlowerPick', {name: this.player, innerouter: 'x'})
+    PickInnerOuterX: function(){
+      store.dispatch('innerouterPick', {name: this.player, innerouter: 'x'})
     },
-    PickUpperLowerX: () => {
+    PickUpperLowerX: function(){
       store.dispatch('upperlowerPick', {name: this.player, upperlower: 'x'})
     }
   }

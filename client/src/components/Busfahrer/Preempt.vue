@@ -1,10 +1,11 @@
 <template>
-    <div id="spreading-cards">
-      Spreading Cards<br>
-      <br>
+    <div id="preempting">
 
+      {{name}} picks color
+      <br><br>
       your cards: {{cards}}
       <br><br>
+
       <template v-if="gameMode === 'colorPick'">
         ColorPick
         <div v-if="players[playerTurn] === player">
@@ -48,9 +49,6 @@ import {store} from '../../store'
 export default {
     name: 'SpreadingCards',
     computed: {
-        players(){
-            return store.state.game.players
-        },
         player(){
             return store.state.playerName
         },
@@ -60,11 +58,8 @@ export default {
         gameMode(){
             return store.state.game.gameMode
         },
-        playerIndex(){
-            return store.state.game.playerCards.findIndex(obj => obj.name === this.player)
-        },
         cards(){
-            return this.playerCards[this.playerIndex]
+            return store.state.driverCards
         }
     },
     methods: {

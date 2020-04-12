@@ -40,7 +40,7 @@ export default {
     }
   },
   watch:{
-    messageArray: async function(){
+    messageArray: async function(){             //TODO set message ids for unique keys in the array
       await setTimeout(200)                                       //FIND ANOTHER SOLUTION FOR THIS SHIT
       var objDiv = document.getElementById("messages");
       objDiv.scrollTop = objDiv.scrollHeight;

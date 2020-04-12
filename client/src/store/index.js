@@ -6,23 +6,37 @@ Vue.use(Vuex)
 
 export const store = new Vuex.Store({
   state: {
-    playerName: '',
+    name: '',
+    roomData: '',
+    gameData: '',
     game: {gameMode: 'preparing'},
     messageArray: [],
-    nothing: ''
+    cardTree: [],
+    nothing: '',
+    shotLog: [],
+    driverCards: []
   },
   mutations: {
     UPDATE_GAME(state, game){
       state.game = game
     },
     UPDATE_PLAYER_NAME(state, name){
-      state.playerName = name
+      state.name = name
     },
     NOTHING(state){
       state.nothing = ''
     },
     ADD_MESSAGE(state, messageObj){
       state.messageArray.push(messageObj)
+    },
+    UPDATE_CARDTREE(state, card, row){
+      state.cardTree.push({card: card, row: row})
+    },
+    UPDATE_SHOTLOG(state, data){
+      state.shotLog.push({from: data.from, to: data.to})
+    },
+    UPDATE_DRIVER_CARDS(state, data){
+      state.driverCards.push({number: data.number, color: data.color, value: data.color})
     }
   },
   actions: {
@@ -40,30 +54,34 @@ export const store = new Vuex.Store({
       commit('NOTHING')                           // TODO how can i delete this nothing?
       this._vm.$socket.client.emit('startGame')
     },
+    socket_UPDATE_DRIVER({commit}, data){
+      comm
+    },
     spreadingCardsResp({commit}, data){
-      commit('NOTING')
-      this._vm.$socket.client.emit('spreadingCardsResp', data)
+      commit('NOTHING')
+      if( data.phase === 'color'){
+        this._vm.$socket.client.emit('colorPick', {name: data.name, color: data.pick})
+      }else if(data.phase === 'value'){
+        this._vm.$socket.client.emit('valuePick', {name: data.name, value: data.pick})
+      }else if(data.phase === 'position'){
+        this._vm.$socket.client.emit('positionPick', {name: data.name, position: data.pick})
+      }else{
+        console.log('ERROR IN spreadingCardsResp IN STORE')
+      }
     },
     flippingCardsResp({commit}, data){
-      commit('NOTING')
+      commit('NOTHING')
       this._vm.$socket.client.emit('flippingCardsResp', data)
     },
     drivingResp({commit}, data){
-      commit('NOTING')
+      commit('NOTHING')
       this._vm.$socket.client.emit('drivingResp', data)
     },
-    colorPick({commit}, data){
-      commit('NOTHING')  
-      this._vm.$socket.client.emit('colorPick', data)
+    shotTo({commit}, data){
+      commit('NOTHING')
+      this._vm.$socket.client.emit('shotTo', data)
     },
-    upperlowerPick({commit}, data){
-      commit('NOTHING')  
-      this._vm.$socket.client.emit('upperlowerPick', data)
-    },
-    innerouterPick({commit}, data){
-      commit('NOTHING')  
-      this._vm.$socket.client.emit('innerouterPick', data)
-    },
+
     socket_gameEntered({commit}, name){
       commit('UPDATE_PLAYER_NAME', name)
       router.push('/room')
@@ -84,13 +102,13 @@ export const store = new Vuex.Store({
     socket_colorPick({commit}, game){
       commit('UPDATE_GAME', game)
     },
-    socket_upperlowerPick({commit}, game){
+    socket_valuePick({commit}, game){
       commit('UPDATE_GAME', game)
     },
-    socket_innerouterPick({commit}, game){
+    socket_positionPick({commit}, game){
       commit('UPDATE_GAME', game)
     },
-    socket_showResult({commit}, game){
+    socket_flipCards({commit}, game){
       commit('UPDATE_GAME', game)
     },
     socket_correctPlace({commit}, game){
@@ -111,6 +129,16 @@ export const store = new Vuex.Store({
     socket_wrongValue({commit}, game){
       commit('UPDATE_GAME', game)
     },
+    socket_updateGame({commit}, game){
+      commit('UPDATE_GAME', game)
+    },
+    socket_shotTo({commit}, data){
+      commit('UPDATE_SHOTLOG', data)
+    },
+    socket_cardFlipped({commit}, data){
+      commit('UPDATE_CARDTREE', {card: data.card, row: data.row})
+    }
+
   },
   getters: {
     getInGame: state => {

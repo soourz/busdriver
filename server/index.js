@@ -82,29 +82,29 @@ function flipCards(roomIndex){                                                  
 function evalMostCards(roomIndex){
     let drivers = []
     for(var i = 0; i<rooms[roomIndex].playerCards.length-1; i++){
-        if(rooms[roomIndex].playerCards[i].card3 !== 'x' && rooms[roomIndex].playerCards[i].card3 !== 'x' && rooms[roomIndex].playerCards[i].card3 === 'x'){
-            drivers.push(rooms[roomIndex].playerCards[i].name)
+        if(rooms[roomIndex].playerCards[i][2] !== 'x' && rooms[roomIndex].playerCards[i][2] !== 'x' && rooms[roomIndex].playerCards[i][2] === 'x'){
+            drivers.push(rooms[roomIndex].players[i].name)
         }
     }
     if (drivers.length === 0){
         for(var i = 0; i<rooms[roomIndex].playerCards.length-1; i++){
-            if((rooms[roomIndex].playerCards[i].card3 === 'x' ^ rooms[roomIndex].playerCards[i].card3 === 'x' ^ rooms[roomIndex].playerCards[i].card3 === 'x') &&
-            !(rooms[roomIndex].playerCards[i].card3 === 'x' && rooms[roomIndex].playerCards[i].card3 === 'x' && rooms[roomIndex].playerCards[i].card3 === 'x')){
-                drivers.push(rooms[roomIndex].playerCards[i].name)
+            if((rooms[roomIndex].playerCards[i][2] === 'x' ^ rooms[roomIndex].playerCards[i][2] === 'x' ^ rooms[roomIndex].playerCards[i][2] === 'x') &&
+            !(rooms[roomIndex].playerCards[i][2] === 'x' && rooms[roomIndex].playerCards[i][2] === 'x' && rooms[roomIndex].playerCards[i][2] === 'x')){
+                drivers.push(rooms[roomIndex].players[i].name)
             }
         }
     }
     if (drivers.length === 0){
         for(var i = 0; i<rooms[roomIndex].playerCards.length-1; i++){
-            if((rooms[roomIndex].playerCards[i].card3 !== 'x' ^ rooms[roomIndex].playerCards[i].card3 !== 'x' ^ rooms[roomIndex].playerCards[i].card3 !== 'x') &&
-            !(rooms[roomIndex].playerCards[i].card3 !== 'x' && rooms[roomIndex].playerCards[i].card3 !== 'x' && rooms[roomIndex].playerCards[i].card3 !== 'x')){
-                drivers.push(rooms[roomIndex].playerCards[i].name)
+            if((rooms[roomIndex].playerCards[i][2] !== 'x' ^ rooms[roomIndex].playerCards[i][2] !== 'x' ^ rooms[roomIndex].playerCards[i][2] !== 'x') &&
+            !(rooms[roomIndex].playerCards[i][2] !== 'x' && rooms[roomIndex].playerCards[i][2] !== 'x' && rooms[roomIndex].playerCards[i][2] !== 'x')){
+                drivers.push(rooms[roomIndex].players[i].name)
             }
         }
     }
     if (drivers.length === 0){
         for(var i = 0; i<rooms[roomIndex].playerCards.length-1; i++){
-                drivers.push(rooms[roomIndex].playerCards[i].name)
+                drivers.push(rooms[roomIndex].players[i].name)
         }
     }
     if (drivers.length === 1){
@@ -115,12 +115,13 @@ function evalMostCards(roomIndex){
 }
 
 function startPreempt(roomIndex, drivers){
+    resetsdf
     rooms[roomIndex].gameMode = 'preempting'
     rooms[roomIndex].preemptIndex = 0
     rooms[roomIndex].playerTurn = 0
-    for(driver of drivers){
-        rooms[roomIndex].playerCards = {name: drivers}
-    }
+    
+    resetPlayerCards[roomIndex]
+
     if(cardsLeft.length === 0){
         cardReset(roomindex)
     }
@@ -184,9 +185,10 @@ function initializeGame(roomIndex){
 
 function resetPlayerCards(roomIndex){
     rooms[roomIndex].playerCards = []
-    for(player of rooms[roomIndex].players){
-        rooms[roomIndex].playerCards[getPlayerIndex] = ['x', 'x', 'x', 'x', 'x', 'x', 'x']
-    }}
+    for(var i = 0; i < rooms[roomIndex.players.length]; i++){
+        rooms[roomIndex].playerCards[getPlayerIndex(roomIndex, player.name)] = ['x', 'x', 'x', 'x', 'x', 'x', 'x']
+    }
+}
 
 io.on('connection', socket => {
     let roomCode
@@ -242,41 +244,45 @@ io.on('connection', socket => {
         }
         if( cardno > 0){
             rooms[roomIndex].playerCards 
-            socket.emit('distributeShots', rooms[roomIndex].flippedCards[rooms[roomIndex].flippedCards.length-1].row)
+            socket.emit('distributeShots', rooms[roomIndex].flippedCards[rooms[roomIndex].flippedCards.length-1].row) //IMPL
         }
     }),
 
     socket.on('preemptPick', data => { //data = {name: , pick: }} pick color, value or position
         let playerIndex = getPlayerIndex(roomIndex, name)
         let newCard = cardToPlayer(roomIndex, name)
-        if(rooms[roomIndex].playerCards[playersTurn].name === data.name){ //eval and return right or wrong
+
+        if(rooms[roomIndex].players[playersTurn].name === data.name){  //check if players turn
             if((preemptIndex % 3) === 0){ //every 3 rounds starts with color again
-                if(data.pick === newCard.color){
-                    //set playersturn +1
-                    //preemptingRightWrong[playerIndex] = true
+                if(data.pick === newCard.color){ //check if color was right
+                    rooms[roomIndex].playerTurn += 1
+                    preemptingRightWrong[playerTurn] = true
                     //update game
                 }else{
-                    shotTo
+                    rooms[roomIndex].playerTurn += 1
+                    preemptingRightWrong[playerTurn] = false
                 }
             }else if((preemptIndex % 3) === 1){
-                if(pick ){
-                    
-                }else{
-                    shotTo
+                if(data.pick === 'higher'){ // value pick //TODO
+                    rooms[roomIndex].playerTurn += 1
+                    preemptingRightWrong[playerTurn] = true
+                }else if(data.pick === 'lower'){
+                    rooms[roomIndex].playerTurn += 1
+                    preemptingRightWrong[playerTurn] = false
                 }
             }else if((preemptIndex % 3) === 2){
-                if(rooms[roomIndex].playerCards[playerIndex].cards[preemptIndex].color === newCard.color){
-                    
+                if(){ // position pick
+                    rooms[roomIndex].playerTurn += 1
+                    preemptingRightWrong[playerTurn] = true 
                 }else{
-                    shotTo
+                    rooms[roomIndex].playerTurn += 1
+                    preemptingRightWrong[playerTurn] = false
                 }
-            }else{
-                soc
-            }
+            } //no else required
         }
 
         if(preemptIndex === drivers.length){
-            let driversTempSave = xx//copy drivers array
+            let driversTempSave = [].concat[rooms[roomIndex].drivers]
             for(var i = 0; i<drivers.length; i++){
                 if(preemptingRightWrong[ị]){
                     drivers.splice(i,1)
@@ -427,19 +433,19 @@ io.on('connection', socket => {
 
         let playerIndex = getPlayerIndex(roomIndex, name)
         if (data.value === 'higher'){
-            if(receivedCard.value > rooms[roomIndex].playerCards[playerIndex].card1.value){
+            if(receivedCard.value > rooms[roomIndex].playerCards[playerIndex][0].value){
                 io.to(rooms[roomIndex].code).emit('updateGame', data.name)
             }else{
                 io.to(rooms[roomIndex].code).emit('wrongValue', data.name)
             }
         }else if(data.value === 'lower'){
-            if(receivedCard.value < rooms[roomIndex].playerCards[playerIndex].card1.value){
+            if(receivedCard.value < rooms[roomIndex].playerCards[playerIndex][0].value){
                 io.to(rooms[roomIndex].code).emit('correctValue', data.name)
             }else{
                 io.to(rooms[roomIndex].code).emit('wrongValue', data.name)
             }
         }else{
-            if(receivedCard.value = rooms[roomIndex].playerCards[playerIndex].card1.value){
+            if(receivedCard.value = rooms[roomIndex].playerCards[playerIndex][0].value){
                 io.to(rooms[roomIndex].code).emit('correctValueX', data.name)
             }else{
                 io.to(rooms[roomIndex].code).emit('wrongValue', data.name)
@@ -470,11 +476,11 @@ io.on('connection', socket => {
         let card1
         let card2
         if (rooms[roomIndex].playerCards[playerIndex][0].value < rooms[roomIndex].playerCards[playerIndex][1].value){
-            card1 = rooms[roomIndex].playerCards[playerIndex].card1
-            card2 = rooms[roomIndex].playerCards[playerIndex].card2
+            card1 = rooms[roomIndex].playerCards[playerIndex][0]
+            card2 = rooms[roomIndex].playerCards[playerIndex][1]
         }else{
-            card1 = rooms[roomIndex].playerCards[playerIndex].card2
-            card2 = rooms[roomIndex].playerCards[playerIndex].card1
+            card1 = rooms[roomIndex].playerCards[playerIndex][1]
+            card2 = rooms[roomIndex].playerCards[playerIndex][0]
         }
 
         if (data.pick === 'inside'){

@@ -5,21 +5,21 @@ import router from '../router'
 Vue.use(Vuex)
 
 export const store = new Vuex.Store({
+
+
   state: {
     nothing: '',
 
     // ROOM
     name: '',
-    roomData: '',
     messageArray: [],
     game: {roomMode: 'lobby'},
 
     // GAME
-    gameData: '',
-    shotLog: [],
-    driverCards: [],
-    cardTree: []
+    shotLog: []
   },
+
+
   mutations: {
     NOTHING(state){
       state.nothing = ''
@@ -40,16 +40,13 @@ export const store = new Vuex.Store({
     UPDATE_SHOTLOG(state, data){
       state.shotLog.push({from: data.from, to: data.to, count: data.count})
     },
-    UPDATE_CARDTREE(state, card, row){
-      state.cardTree.push({card: card, row: row})
-    },
     UPDATE_DRIVER_CARDS(state, data){
       state.driverCards.push({number: data.number, color: data.color, value: data.color})
     }
   },
+
+
   actions: {
-
-
     //OUTGOING SOCKET CALLS
     sendMessage({commit, state}, message){
       commit('NOTHING')                           // TODO how can i delete this nothing? 
@@ -112,13 +109,11 @@ export const store = new Vuex.Store({
     socket_updateGame({commit}, game){
       commit('UPDATE_GAME', game)
     },
-    socket_cardFlipped({commit}, data){
-      commit('UPDATE_CARDTREE', {card: data.card, row: data.row})
-    },
     socket_shotTo({commit}, data){
       commit('UPDATE_SHOTLOG', data)
     }
   },
+
 
   getters: {
     getInGame: state => {

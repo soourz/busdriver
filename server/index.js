@@ -336,10 +336,6 @@ function updateGame(roomIndex){
     io.to(rooms[roomIndex].code).emit('updateGame', rooms[roomIndex]) //IMPL
 }
 
-function emptyGlasses(roomIndex, data){ //data = {from: player, to: 'all' / player}
-    io.to(roomCode).emit('emptyGlasses', data) //IMPL
-}
-
 function shotTo(roomIndex, data){ //data = {from: , to: , count: }
     //count = 100 when x was correct
 

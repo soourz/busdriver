@@ -6,58 +6,69 @@ Vue.use(Vuex)
 
 export const store = new Vuex.Store({
   state: {
+    nothing: '',
+
+    // ROOM
     name: '',
     roomData: '',
-    gameData: '',
-    game: {gameMode: 'preparing'},
     messageArray: [],
-    cardTree: [],
-    nothing: '',
+    game: {roomMode: 'lobby'},
+
+    // GAME
+    gameData: '',
     shotLog: [],
-    driverCards: []
+    driverCards: [],
+    cardTree: []
   },
   mutations: {
-    UPDATE_GAME(state, game){
-      state.game = game
-    },
-    UPDATE_PLAYER_NAME(state, name){
-      state.name = name
-    },
     NOTHING(state){
       state.nothing = ''
+    },
+
+    // ROOM
+    UPDATE_PLAYER_NAME(state, name){
+      state.name = name
     },
     ADD_MESSAGE(state, messageObj){
       state.messageArray.push(messageObj)
     },
-    UPDATE_CARDTREE(state, card, row){
-      state.cardTree.push({card: card, row: row})
+
+    // GAME
+    UPDATE_GAME(state, game){
+      state.game = game
     },
     UPDATE_SHOTLOG(state, data){
-      state.shotLog.push({from: data.from, to: data.to})
+      state.shotLog.push({from: data.from, to: data.to, count: data.count})
+    },
+    UPDATE_CARDTREE(state, card, row){
+      state.cardTree.push({card: card, row: row})
     },
     UPDATE_DRIVER_CARDS(state, data){
       state.driverCards.push({number: data.number, color: data.color, value: data.color})
     }
   },
   actions: {
-    joinGame({commit}, data){
-      commit('NOTHING')                           // TODO how can i delete this nothing?
-      this._vm.$socket.client.emit('joinGame', data)
-    },
+
+
+    //OUTGOING SOCKET CALLS
     sendMessage({commit, state}, message){
       commit('NOTHING')                           // TODO how can i delete this nothing? 
       let code = state.game.code
       let name = state.playerName
       this._vm.$socket.client.emit('newMessage', {message: message, code: code, name: name})
     },
+    joinGame({commit}, data){
+      commit('NOTHING')                           // TODO how can i delete this nothing?
+      this._vm.$socket.client.emit('joinGame', data)
+    },
     startGame({commit}){
       commit('NOTHING')                           // TODO how can i delete this nothing?
       this._vm.$socket.client.emit('startGame')
     },
-    socket_UPDATE_DRIVER({commit}, data){
-      comm
+    socket_UPDATE_DRIVER({commit}, data){   //TODO
+      commit('NOTHING')
     },
-    spreadingCardsResp({commit}, data){
+    spreadingCardsResp({commit}, data){ //TODO change spreading cards to cardpick
       commit('NOTHING')
       if( data.phase === 'color'){
         this._vm.$socket.client.emit('colorPick', {name: data.name, color: data.pick})
@@ -65,9 +76,10 @@ export const store = new Vuex.Store({
         this._vm.$socket.client.emit('valuePick', {name: data.name, value: data.pick})
       }else if(data.phase === 'position'){
         this._vm.$socket.client.emit('positionPick', {name: data.name, position: data.pick})
-      }else{
-        console.log('ERROR IN spreadingCardsResp IN STORE')
       }
+    },
+    cardPick({commit}, data){
+      this._vm.$socket.client.emit('cardPick', data)
     },
     flippingCardsResp({commit}, data){
       commit('NOTHING')
@@ -79,67 +91,35 @@ export const store = new Vuex.Store({
     },
     shotTo({commit}, data){
       commit('NOTHING')
-      this._vm.$socket.client.emit('shotTo', data)
+      this._vm.$socket.client.emit('shotTo', {from: data.from, to: data.to, count: data.count}) //TODO update count
     },
 
-    socket_gameEntered({commit}, name){
-      commit('UPDATE_PLAYER_NAME', name)
-      router.push('/room')
-    },
-    socket_newPlayer({commit}, game){
-      commit('UPDATE_GAME', game)
-    },
-    socket_leaveGame({commit}){
-      commit('UPDATE_GAME', {})
-      commit('UPDATE_PLAYER_NAME', '')
-    },
+    //INCOMING SOCKET CALLS
+
+    //ROOM FEATURES
     socket_newMessage({commit}, messageObj){
       commit('ADD_MESSAGE', messageObj)
     },
-    socket_playerLeft({commit}, game){
+    socket_updateRoom({commit}, game){
       commit('UPDATE_GAME', game)
     },
-    socket_colorPick({commit}, game){
-      commit('UPDATE_GAME', game)
+    socket_roomEntered({commit}, name){
+      commit('UPDATE_PLAYER_NAME', name)
+      router.push('/room')
     },
-    socket_valuePick({commit}, game){
-      commit('UPDATE_GAME', game)
-    },
-    socket_positionPick({commit}, game){
-      commit('UPDATE_GAME', game)
-    },
-    socket_flipCards({commit}, game){
-      commit('UPDATE_GAME', game)
-    },
-    socket_correctPlace({commit}, game){
-      commit('UPDATE_GAME', game)
-    },
-    socket_wrongPlace({commit}, game){
-      commit('UPDATE_GAME', game)
-    },
-    socket_correctPlaceX({commit}, game){
-      commit('UPDATE_GAME', game)
-    },
-    socket_correctValue({commit}, game){
-      commit('UPDATE_GAME', game)
-    },
-    socket_correctValueX({commit}, game){
-      commit('UPDATE_GAME', game)
-    },
-    socket_wrongValue({commit}, game){
-      commit('UPDATE_GAME', game)
-    },
+
+    //GAME FEATURES
     socket_updateGame({commit}, game){
       commit('UPDATE_GAME', game)
     },
-    socket_shotTo({commit}, data){
-      commit('UPDATE_SHOTLOG', data)
-    },
     socket_cardFlipped({commit}, data){
       commit('UPDATE_CARDTREE', {card: data.card, row: data.row})
+    },
+    socket_shotTo({commit}, data){
+      commit('UPDATE_SHOTLOG', data)
     }
-
   },
+
   getters: {
     getInGame: state => {
       if (state.playerName !== ''){

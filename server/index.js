@@ -2,10 +2,163 @@ const express = require('express')()
 const http = require('http').Server(express)
 const io = require('socket.io')(http)
 
-let rooms = []
 
+// CONSTANTS
 const CARDS = [{color: 'heart', value: 7},{color: 'heart', value: 8},{color: 'heart', value: 9},{color: 'heart', value: 10},{color: 'heart', value: 11},{color: 'heart', value: 12},{color: 'heart', value: 13},{color: 'heart', value: 14},{color: 'pik', value: 7},{color: 'pik', value: 8},{color: 'pik', value: 9},{color: 'pik', value: 10},{color: 'pik', value: 11},{color: 'pik', value: 12},{color: 'pik', value: 13},{color: 'pik', value: 14},{color: 'cross', value: 7},{color: 'cross', value: 8},{color: 'cross', value: 9},{color: 'cross', value: 10},{color: 'cross', value: 11},{color: 'cross', value: 12},{color: 'cross', value: 13},{color: 'cross', value: 14},{color: 'caro', value: 7},{color: 'caro', value: 8},{color: 'caro', value: 9},{color: 'caro', value: 10},{color: 'caro', value: 11},{color: 'caro', value: 12},{color: 'caro', value: 13},{color: 'caro', value: 14}]
 
+
+// CENTRAL ROOMS ARRAY - COINTAINS ALL DATA
+let rooms = []
+
+
+// GAME FUNCTIONS
+function initializeGame(roomIndex){
+    //room features: code, users, roomMode
+    rooms[roomIndex].roomMode = 'inGame'
+    rooms[roomIndex].gameMode = 'colorPick'
+
+    resetPlayerCards(roomIndex)
+    resetCardStack(roomIndex)
+
+    rooms[roomIndex].players = JSON.parse(JSON.stringify(rooms[roomIndex].users))
+    rooms[roomIndex].flippedCards = [] //relevant for flipping cards
+    rooms[roomIndex].drivers = [] //relevant for preempting and driving
+    rooms[roomIndex].preemptingRightWrong = [] //relevant for preempting
+    rooms[roomIndex].preemptIndex = 0 //in preempting are we at color, value or position
+    rooms[roomIndex].playerTurn = 0 //relevant for preempting
+
+    rooms[roomIndex].driverStreak = 0 //relevant for driving
+}
+
+function initializeRoom(newCode, playerName){
+    rooms.push({code: newCode, users: [playerName], roomMode: 'lobby'})
+    return rooms.findIndex(x => x.code === newCode)
+}
+
+function playerPick(roomIndex, data){ //data = {name: '', pick: ''}
+//pick must be red / black / higher / lower / valueX / inside / outside / positionX
+
+    if((data.pick === 'red') || (data.pick === 'black')){
+
+    }else if((data.pick === 'higher') || (data.pick === 'lower') || (data.pick === valueX)){
+
+    }else if((data.pick === 'inside') || (data.pick === 'outside') || (data.pick === 'positionX')){
+
+    }
+}
+
+function startPreempt(roomIndex, drivers){
+    rooms[roomIndex].gameMode = 'preempting'
+    rooms[roomIndex].preemptIndex = 0
+    rooms[roomIndex].playerTurn = 0
+    
+    resetPlayerCards[roomIndex]
+    resetCardStack(roomindex)
+
+    io.to(roomCode).emit('updateGame', rooms[roomIndex])
+}
+
+function startDrive(roomIndex){
+    rooms[roomIndex].gameMode = 'driving'
+    resetPlayerCards(roomIndex, name)
+
+    //TODO
+}
+
+// GAME PICKS
+function cardPick(roomIndex, name, pick){
+
+}
+
+function colorPick(roomIndex, name, color){
+    if (rooms[roomIndex].cardsLeft.length === 0){
+        resetCardStack(roomIndex)
+    }
+
+    let receivedCard = cardToPlayer(roomIndex,name)
+
+    if ((receivedCard.color === 'heart') || (receivedCard.color === 'caro')){
+        if (color !== 'red'){
+            shotTo(roomIndex, {from: 'game', to: name, count: 1})
+        }
+    }else{
+        if (color !== 'black'){
+            shotTo(roomIndex, {from: 'game', to: name, count: 1})
+        }
+    }
+    updateGame(rooms[roomIndex])
+}
+
+function positionPick(roomIndex, name, position){
+    if (rooms[roomIndex].cardsLeft.length === 0){
+        resetCardStack(roomIndex)
+    }
+
+    let receivedCard = cardToPlayer(roomIndex,name)
+
+    let playerIndex = getPlayerIndex(roomIndex, name)
+    if (data.value === 'higher'){
+        if(receivedCard.value > rooms[roomIndex].playerCards[playerIndex][0].value){
+            io.to(rooms[roomIndex].code).emit('updateGame', data.name)
+        }else{
+            io.to(rooms[roomIndex].code).emit('wrongValue', data.name)
+        }
+    }else if(data.value === 'lower'){
+        if(receivedCard.value < rooms[roomIndex].playerCards[playerIndex][0].value){
+            io.to(rooms[roomIndex].code).emit('correctValue', data.name)
+        }else{
+            io.to(rooms[roomIndex].code).emit('wrongValue', data.name)
+        }
+    }else{
+        if(receivedCard.value = rooms[roomIndex].playerCards[playerIndex][0].value){
+            io.to(rooms[roomIndex].code).emit('correctValueX', data.name)
+        }else{
+            io.to(rooms[roomIndex].code).emit('wrongValue', data.name)
+        }
+    }
+}
+
+function valuePick(roomIndex, name, value){
+    if (rooms[roomIndex].cardsLeft.length === 0){
+        resetCardStack(roomIndex)
+    }
+
+    let receivedCard = cardToPlayer(roomIndex,name)
+
+    let playerIndex = getPlayerIndex(roomIndex,name)
+    let card1
+    let card2
+    if (rooms[roomIndex].playerCards[playerIndex][0].value < rooms[roomIndex].playerCards[playerIndex][1].value){
+        card1 = rooms[roomIndex].playerCards[playerIndex][0]
+        card2 = rooms[roomIndex].playerCards[playerIndex][1]
+    }else{
+        card1 = rooms[roomIndex].playerCards[playerIndex][1]
+        card2 = rooms[roomIndex].playerCards[playerIndex][0]
+    }
+
+    if (data.pick === 'inside'){
+        if((receivedCard.value > card1.value) && (receivedCard.value < card2.value)){
+
+        }else{
+            shotTo(roomIndex, {from: game, to: name, count: 1})
+        }
+    }else if(data.pick ==='outside'){
+        if((receivedCard.value < card1.value) || (receivedCard.value > card2.value)){
+
+        }else{
+            shotTo(roomIndex, {from: game, to: name, count: 1})
+        }
+    }else{
+        if((receivedCard.value === card1.value) || (receivedCard.value === card2.value)){
+
+        }else{
+            shotTo(roomIndex, {from: game, to: name, count: 1})
+        }
+    }
+    updateGame(roomIndex)
+}
+
+// GAME FUNCTIONS UTILS
 function getPlayerIndex(roomIndex, name){
     let index = rooms[roomIndex].players.findIndex(obj => obj.name === name)
     return index
@@ -28,7 +181,7 @@ function flipNewCard(roomIndex, number){
     return card
 }
 
-function flipCards(roomIndex){                                                    //TODO REMOVE FUCKING SHIT CODE
+function flipCards(roomIndex){  //TODO remove shit code
 
     rooms[roomIndex].gameMode = 'flippingCards'
 
@@ -80,14 +233,17 @@ function flipCards(roomIndex){                                                  
 }
 
 function evalMostCards(roomIndex){
+    //uses playerCards - writes to drivers
+
     let drivers = []
-    for(var i = 0; i<rooms[roomIndex].playerCards.length-1; i++){
-        if(rooms[roomIndex].playerCards[i][2] !== 'x' && rooms[roomIndex].playerCards[i][2] !== 'x' && rooms[roomIndex].playerCards[i][2] === 'x'){
+
+    for(var i = 0; i<rooms[roomIndex].playerCards.length-1; i++){ //copy players that got 3 cards to drivers
+        if(rooms[roomIndex].playerCards[i][0] !== 'x' && rooms[roomIndex].playerCards[i][1] !== 'x' && rooms[roomIndex].playerCards[i][2] === 'x'){
             drivers.push(rooms[roomIndex].players[i].name)
         }
     }
     if (drivers.length === 0){
-        for(var i = 0; i<rooms[roomIndex].playerCards.length-1; i++){
+        for(var i = 0; i<rooms[roomIndex].playerCards.length-1; i++){ //copy players that got 2 cards to drivers
             if((rooms[roomIndex].playerCards[i][2] === 'x' ^ rooms[roomIndex].playerCards[i][2] === 'x' ^ rooms[roomIndex].playerCards[i][2] === 'x') &&
             !(rooms[roomIndex].playerCards[i][2] === 'x' && rooms[roomIndex].playerCards[i][2] === 'x' && rooms[roomIndex].playerCards[i][2] === 'x')){
                 drivers.push(rooms[roomIndex].players[i].name)
@@ -95,18 +251,20 @@ function evalMostCards(roomIndex){
         }
     }
     if (drivers.length === 0){
-        for(var i = 0; i<rooms[roomIndex].playerCards.length-1; i++){
+        for(var i = 0; i<rooms[roomIndex].playerCards.length-1; i++){ //copy players that got 1 cards to drivers
             if((rooms[roomIndex].playerCards[i][2] !== 'x' ^ rooms[roomIndex].playerCards[i][2] !== 'x' ^ rooms[roomIndex].playerCards[i][2] !== 'x') &&
             !(rooms[roomIndex].playerCards[i][2] !== 'x' && rooms[roomIndex].playerCards[i][2] !== 'x' && rooms[roomIndex].playerCards[i][2] !== 'x')){
                 drivers.push(rooms[roomIndex].players[i].name)
             }
         }
     }
+
     if (drivers.length === 0){
-        for(var i = 0; i<rooms[roomIndex].playerCards.length-1; i++){
+        for(var i = 0; i<rooms[roomIndex].playerCards.length-1; i++){ //copy all players to drivers
                 drivers.push(rooms[roomIndex].players[i].name)
         }
     }
+
     if (drivers.length === 1){
         startDrive(roomIndex, drivers)
     }else{
@@ -114,31 +272,11 @@ function evalMostCards(roomIndex){
     }
 }
 
-function startPreempt(roomIndex, drivers){
-    resetsdf
-    rooms[roomIndex].gameMode = 'preempting'
-    rooms[roomIndex].preemptIndex = 0
-    rooms[roomIndex].playerTurn = 0
-    
-    resetPlayerCards[roomIndex]
-
-    if(cardsLeft.length === 0){
-        cardReset(roomindex)
-    }
-    io.to(roomCode).emit('updateGame')
-}
-
-function startDrive(roomIndex){
-    rooms[roomIndex].gameMode = 'driving'
-    resetPlayerCards(roomIndex, name)
-
-    //TODO
-}
-
 function cardToPlayer(roomIndex, name){ // search who calls this function and remove cardno
     let cardIndex = Math.floor(Math.random()*CARDS.length)
     let playerIndex = getPlayerIndex(roomIndex, name)
     let card = rooms[roomIndex].cardsLeft[cardIndex]
+
     let nextCard = 0
 
     while (rooms[roomIndex].playerCards[playerIndex][nextCard] !== 'x'){
@@ -152,43 +290,36 @@ function cardToPlayer(roomIndex, name){ // search who calls this function and re
     return card
 }
 
-function cardReset(roomIndex){
-    rooms[roomIndex].cardsLeft = CARDS
-}
-
-function emptyGlasses(roomIndex, victims){ //victims 'all' or 'picker'
-    //TODO
-}
-
-function initializeRoom(newCode, playerName){
-    rooms.push({code: newCode, users: [playerName], roomMode: 'lobby'})
-    return rooms.findIndex(x => x.code === newCode)
-}
-
-function initializeGame(roomIndex){
-    //room features: code, users, roomMode
-    rooms[roomIndex].roomMode = 'inGame'
-    rooms[roomIndex].gameMode = 'colorPick'
-
-    resetPlayerCards(roomIndex)
-    cardReset(roomIndex)
-
-    rooms[roomIndex].players = [].concat(rooms[roomIndex].users)
-    rooms[roomIndex].flippedCards = [] //relevant for flipping cards
-    rooms[roomIndex].drivers = [] //relevant for preempting and driving
-    rooms[roomIndex].preemptingRightWrong = [] //relevant for preempting
-    rooms[roomIndex].preemptIndex = 0 //in preempting are we at color, value or position
-    rooms[roomIndex].playerTurn = 0 //relevant for preempting
-
-    rooms[roomIndex].driverStreak = 0 //relevant for driving
-}
-
 function resetPlayerCards(roomIndex){
     rooms[roomIndex].playerCards = []
     for(var i = 0; i < rooms[roomIndex.players.length]; i++){
         rooms[roomIndex].playerCards[getPlayerIndex(roomIndex, player.name)] = ['x', 'x', 'x', 'x', 'x', 'x', 'x']
     }
 }
+
+function resetCardStack(roomIndex){
+    rooms[roomIndex].cardsLeft = JSON.parse(JSON.stringify(CARDS))
+}
+
+// EMIT FUNCTIONS
+function updateRoom(roomIndex){
+    io.to(rooms[roomIndex].code).emit('updateRoom', rooms[roomIndex]) //IMPL
+}
+
+function updateGame(roomIndex){
+    io.to(rooms[roomIndex].code).emit('updateGame', rooms[roomIndex]) //IMPL
+}
+
+function emptyGlasses(roomIndex, data){ //data = {from: player, to: 'all' / player}
+    io.to(roomCode).emit('emptyGlasses', data) //IMPL
+}
+
+function shotTo(roomIndex, data){ //data = {from: , to: , count: }
+    io.to(roomCode).emit('shotTo', {from: data.from, to: data.to, count: data.count})
+}
+
+
+
 
 io.on('connection', socket => {
     let roomCode
@@ -210,7 +341,8 @@ io.on('connection', socket => {
             roomIndex = initializeRoom(data.code, name)
         }
 
-        io.to(roomCode).emit('updateRoom', rooms[roomIndex]) //IMPL
+        socket.emit('roomEntered', name) //IMPL
+        updateRoom(roomIndex)
 
         console.log(data.name + ' joined ' + roomCode + ' with the index ' + roomIndex)
     }),
@@ -220,8 +352,8 @@ io.on('connection', socket => {
         io.to(roomCode).emit('newMessage', {message: data.message, name: data.name})
     }),
 
-    socket.on('shotTo', data => {
-        io.to(roomCode).emit('shotTo', {from: data.from, to: data.to})
+    socket.on('shotTo', data => { //data = {from: , to: , count: }
+        shotTo({from: data.from, to: data.to, count: data.count})
     }),
 
     socket.on('gotFlippedCard', () => {
@@ -249,40 +381,35 @@ io.on('connection', socket => {
     }),
 
     socket.on('preemptPick', data => { //data = {name: , pick: }} pick color, value or position
-        let playerIndex = getPlayerIndex(roomIndex, name)
         let newCard = cardToPlayer(roomIndex, name)
 
-        if(rooms[roomIndex].players[playersTurn].name === data.name){  //check if players turn
+        if(rooms[roomIndex].players[playerTurn].name === data.name){  //check if players turn
             if((preemptIndex % 3) === 0){ //every 3 rounds starts with color again
                 if(data.pick === newCard.color){ //check if color was right
-                    rooms[roomIndex].playerTurn += 1
                     preemptingRightWrong[playerTurn] = true
                     //update game
                 }else{
-                    rooms[roomIndex].playerTurn += 1
                     preemptingRightWrong[playerTurn] = false
                 }
             }else if((preemptIndex % 3) === 1){
                 if(data.pick === 'higher'){ // value pick //TODO
-                    rooms[roomIndex].playerTurn += 1
                     preemptingRightWrong[playerTurn] = true
                 }else if(data.pick === 'lower'){
-                    rooms[roomIndex].playerTurn += 1
                     preemptingRightWrong[playerTurn] = false
                 }
             }else if((preemptIndex % 3) === 2){
-                if(){ // position pick
-                    rooms[roomIndex].playerTurn += 1
+                if(){ // position pick //xxxxxxxx
                     preemptingRightWrong[playerTurn] = true 
                 }else{
-                    rooms[roomIndex].playerTurn += 1
                     preemptingRightWrong[playerTurn] = false
                 }
-            } //no else required
+            }
+        }else{
+            //TODO react on not players turn
         }
 
-        if(preemptIndex === drivers.length){
-            let driversTempSave = [].concat[rooms[roomIndex].drivers]
+        if((playerTurn+1) === drivers.length){ //if all drivers picked evaluate loosers
+            let driversTempSave = JSON.parse(JSON.stringify(rooms[roomIndex].drivers))
             for(var i = 0; i<drivers.length; i++){
                 if(preemptingRightWrong[ị]){
                     drivers.splice(i,1)
@@ -290,14 +417,17 @@ io.on('connection', socket => {
             }
 
             if(drivers.length === 0){
-                drivers = driversTempSave
+                drivers = driversTempSave //
             }
 
             if(drivers.length === 1){
-                startDrive(roomIndex, driver)
+                startDrive(roomIndex, driver) //change to driving mode
             }else{
-                io.to(roomCode).emit('updateGame', rooms[roomIndex])
+                io.to(roomCode).emit('updateGame', rooms[roomIndex]) //
             }
+        }else{ //next driver has to pick
+            rooms[roomIndex].playerTurn += 1
+            io.to(roomCode).emit('updateGame', rooms[roomIndex])
         }
     }),
 
@@ -381,132 +511,54 @@ io.on('connection', socket => {
     //
     socket.on('startGame', () => {
         initializeGame(roomIndex)
-        io.to(rooms[roomIndex].code).emit('colorPick', rooms[roomIndex])
+        updateGame(roomIndex)
     }),
 
-    //INPUT: function activation, data object with color and name
-    //OUTPUT: players receive changed game object (changes: gameMode, cardsLeft, cards[player].card2, playersturn)
-    socket.on('colorPick', data => { //data.name and data.code required
+    socket.on('colorPick', data => { //data = {name: , color: }
+    //OUTPUT: players receive changed game object
+    //(changes: gameMode, cardsLeft, cards[player].card2, playerTurn)
 
-        console.log(data)
-        if (rooms[roomIndex].cardsLeft.length === 0){
-            cardReset(roomIndex)
-            //io.to(rooms[roomIndex].code).emit('cardsReseted')             //TODO CARDS RESETTED NOTIFICATION
-        }
-
-        let receivedCard = cardToPlayer(roomIndex,name)
-
-        if ((receivedCard.color === 'heart')||(receivedCard.color === 'caro')){
-            if (data.color === 'red'){
-                io.to(rooms[roomIndex].code).emit('correctColor', data.name)
-            }else{
-                io.to(rooms[roomIndex].code).emit('wrongColor', data.name)
-            }
-        }else{
-            if (receivedCard.color === 'black'){
-                io.to(rooms[roomIndex].code).emit('correctColor', data.name)
-            }else{
-                io.to(rooms[roomIndex].code).emit('wrongColor', data.name)
-            }
-        }
+        colorPick(roomIndex, name, data.color) //deals card and updates game
 
         let playerTurn = rooms[roomIndex].playerTurn // TODO: SET THIS TO BEGINNING AND REMOVE INDEXOF PLAYER
+        
         if (rooms[roomIndex].players.length-1 > playerTurn){
             rooms[roomIndex].playerTurn++
-            io.to(rooms[roomIndex].code).emit('colorPick', rooms[roomIndex])
+            updateGame(roomIndex)
         }else{
             rooms[roomIndex].gameMode = 'valuePick'
             rooms[roomIndex].playerTurn = 0
-            io.to(rooms[roomIndex].code).emit('valuePick', rooms[roomIndex])
+            updateGame(roomIndex)
         }
     }),
 
-    //INPUT: function activation, data object with upperlower and name
-    //OUTPUT: players receive changed game object (changes: gameMode, cardsLeft, cards[player].card2, playersturn)
-    socket.on('valuePick', data => {
-        if (rooms[roomIndex].cardsLeft.length === 0){
-            cardReset(roomIndex)
-            //io.to(rooms[roomIndex].code).emit('cardsReseted')                 //TODO CARDS RESETTED NOTIFICATION
-        }
-        
-        let receivedCard = cardToPlayer(roomIndex,name)
+    socket.on('valuePick', data => { //data = {name: , value: higher/lower} 
+    //OUTPUT: players receive changed game object
+    //(changes: gameMode, cardsLeft, cards[player].card2, playerTurn)
 
-        let playerIndex = getPlayerIndex(roomIndex, name)
-        if (data.value === 'higher'){
-            if(receivedCard.value > rooms[roomIndex].playerCards[playerIndex][0].value){
-                io.to(rooms[roomIndex].code).emit('updateGame', data.name)
-            }else{
-                io.to(rooms[roomIndex].code).emit('wrongValue', data.name)
-            }
-        }else if(data.value === 'lower'){
-            if(receivedCard.value < rooms[roomIndex].playerCards[playerIndex][0].value){
-                io.to(rooms[roomIndex].code).emit('correctValue', data.name)
-            }else{
-                io.to(rooms[roomIndex].code).emit('wrongValue', data.name)
-            }
-        }else{
-            if(receivedCard.value = rooms[roomIndex].playerCards[playerIndex][0].value){
-                io.to(rooms[roomIndex].code).emit('correctValueX', data.name)
-            }else{
-                io.to(rooms[roomIndex].code).emit('wrongValue', data.name)
-            }
-        }
+        positionPick(roomIndex, name, data.value)
 
         let playerTurn = rooms[roomIndex].playerTurn // TODO: SET THIS TO BEGINNING AND REMOVE INDEXOF PLAYER
         if (rooms[roomIndex].players.length-1 > playerTurn){
             rooms[roomIndex].playerTurn++
-            io.to(rooms[roomIndex].code).emit('valuePick', rooms[roomIndex])
+            updateGame(roomIndex)
         }else{
             rooms[roomIndex].gameMode = 'positionPick'
             rooms[roomIndex].playerTurn = 0
-            io.to(rooms[roomIndex].code).emit('positionPick', rooms[roomIndex])
+            updateGame(roomIndex)
         }
     }),
 
-    //INPUT: function activation, data object with innerouter and name
-    //OUTPUT: players receive changed game object (changes: gameMode, cardsLeft, cards[player].card3, playersturn)
-    socket.on('positionPick', data => { // data = {name: , pick: }
-        if (rooms[roomIndex].cardsLeft.length === 0){
-            cardReset(roomIndex)
-            //io.to(rooms[roomIndex].code).emit('cardsReseted')
-        }
-        let receivedCard = cardToPlayer(roomIndex,name)
+    socket.on('positionPick', data => { // data = {name: , pick: inside/outside}
+    //OUTPUT: players receive changed game object
+    //(changes: gameMode, cardsLeft, playerCards, playerTurn)
 
-        let playerIndex = getPlayerIndex(roomIndex,name)
-        let card1
-        let card2
-        if (rooms[roomIndex].playerCards[playerIndex][0].value < rooms[roomIndex].playerCards[playerIndex][1].value){
-            card1 = rooms[roomIndex].playerCards[playerIndex][0]
-            card2 = rooms[roomIndex].playerCards[playerIndex][1]
-        }else{
-            card1 = rooms[roomIndex].playerCards[playerIndex][1]
-            card2 = rooms[roomIndex].playerCards[playerIndex][0]
-        }
-
-        if (data.pick === 'inside'){
-            if((receivedCard.value > card1.value) && (receivedCard.value < card2.value)){
-                io.to(rooms[roomIndex].code).emit('correctPlace', data.name)
-            }else{
-                io.to(rooms[roomIndex].code).emit('wrongPlace', data.name)
-            }
-        }else if(data.pick ==='outside'){
-            if((receivedCard.value < card1.value) || (receivedCard.value > card2.value)){
-                io.to(rooms[roomIndex].code).emit('correctPlace', data.name)
-            }else{
-                io.to(rooms[roomIndex].code).emit('wrongPlace', data.name)
-            }
-        }else{
-            if((receivedCard.value === card1.value) || (receivedCard.value === card2.value)){
-                io.to(rooms[roomIndex].code).emit('correctPlaceX', data.name)
-            }else{
-                io.to(rooms[roomIndex].code).emit('wrongPlaceX', data.name)
-            }
-        }
+        valuePick(roomIndex, name, data.pick)
 
         let playerTurn = rooms[roomIndex].playerTurn // TODO: SET THIS TO BEGINNING AND REMOVE INDEXOF PLAYER
         if (rooms[roomIndex].players.length-1 > playerTurn){
             rooms[roomIndex].playerTurn++
-            io.to(rooms[roomIndex].code).emit('positionPick', rooms[roomIndex])
+            updateGame(roomIndex)
         }else{
             rooms[roomIndex].gameMode = 'flippingCards'
             rooms[roomIndex].playerTurn = 0

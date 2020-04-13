@@ -64,7 +64,7 @@ export default {
             }
         },
         shotTo: function(name){
-            store.dispatch('shotTo', {from: this.player, to: name})
+            store.dispatch('shotTo', {from: this.player, to: name, count: 1})
         }
     }
 }

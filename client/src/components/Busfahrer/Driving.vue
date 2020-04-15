@@ -1,18 +1,46 @@
 <template>
-    <div id="driving">
+    <div id="preempting">
+    preempting
+    <br><br>
+    driver: {{drivers}}
+    <br><br>
+    your cards: {{cards}}
+    <br><br>
 
-      {{driver}} is driving
-      <br><br>
-      your cards: {{cards}}
-      <br><br>
+    <template v-if="(innerIndex % 3) === 0">
+        ColorPick
+        <div v-if="drivers[0] === name">
+            <button @click="driverPick('black')">Black</button>
+            <button @click="driverPick('red')">Red</button>
+        </div>
+        <div v-else>
+            Not your turn
+        </div>
+    </template>
 
-      <template v-if="status === 'watcher'">
-        Watching
-      </template>
+    <template v-else-if="(innerIndex % 3) === 1">
+        upperlowerPick
+        <div v-if="drivers[0] === name">
+        <button @click="driverPick('higher')">Higher</button>
+        <button @click="driverPick('lower')">Lower</button>
+        <button @click="driverPick('x')">X</button>
+        </div>
+        <div v-else>
+            Not your turn
+        </div>
+    </template>
 
-      <template v-else>
-          Driving
-      </template>
+    <template v-else-if="(innerIndex % 3) === 2">
+        innerouterpick
+        <div v-if="drivers[0] === name">
+            <button @click="driverPick('inside')">Inside</button>
+            <button @click="driverPick('outside')">Outside</button>
+            <button @click="driverPick('x')">x</button>
+        </div>
+        <div v-else>
+            Not your turn
+        </div>
+    </template>
     </div>
 </template>
 
@@ -20,24 +48,28 @@
 import {store} from '../../store'
 
 export default {
-    name: 'SpreadingCards',
+    name: 'Driving',
     computed: {
-        player(){
-            return store.state.playerName
+        game(){
+            return store.state.game
         },
-        playerTurn(){
-            return store.state.game.playerTurn
+        innerIndex(){
+            return this.game.innerIndex
         },
-        gameMode(){
-            return store.state.game.gameMode
+        name(){
+            return store.state.name
         },
         cards(){
-            return store.state.driverCards
+            let index = this.game.players.findIndex(obj => obj.name === this.name)
+            return store.state.game.playerCards[index]
+        },
+        drivers(){
+            return this.game.drivers
         }
     },
     methods: {
-        spreadingCardsResp: (phase, name, pick) => {
-            store.dispatch('spreadingCardsResp', {phase: phase, name: name, pick: pick})
+        driverPick: function(pick){
+            store.dispatch('driverPick', {name: this.name, pick: pick})
         }
     }
 }

@@ -1,45 +1,47 @@
 <template>
     <div id="preempting">
-
-      {{name}} picks color
+      preempting
+      <br><br>
+      preempters: {{drivers}}
       <br><br>
       your cards: {{cards}}
       <br><br>
 
-      <template v-if="gameMode === 'colorPick'">
+      <template v-if="(innerIndex % 3) === 0">
         ColorPick
-        <div v-if="players[playerTurn] === player">
-          <button @click="spreadingCardsResp('color', player, 'black')">Black</button>
-          <button @click="spreadingCardsResp('color', player, 'red')">Red</button>
+        <div v-if="drivers[playerTurn] === name">
+          <button @click="preemptPick('black')">Black</button>
+          <button @click="preemptPick('red')">Red</button>
         </div>
         <div v-else>
           Not your turn
         </div>
       </template>
 
-      <template v-else-if="gameMode === 'valuePick'">
+      <template v-else-if="(innerIndex % 3) === 1">
         upperlowerPick
-        <div v-if="players[playerTurn] === player">
-          <button @click="spreadingCardsResp('value', player, 'higher')">Higher</button>
-          <button @click="spreadingCardsResp('value', player, 'lower')">Lower</button>
-          <button @click="spreadingCardsResp('value', player, 'x')">X</button>
+        <div v-if="drivers[playerTurn] === name">
+          <button @click="preemptPick('higher')">Higher</button>
+          <button @click="preemptPick('lower')">Lower</button>
+          <button @click="preemptPick('x')">X</button>
         </div>
         <div v-else>
           Not your turn
         </div>
       </template>
 
-      <template v-else-if="gameMode === 'positionPick'">
+      <template v-else-if="(innerIndex % 3) === 2">
         innerouterpick
-        <div v-if="players[playerTurn] === player">
-        <button @click="spreadingCardsResp('position', player, 'inside')">Inside</button>
-        <button @click="spreadingCardsResp('position', player, 'outisde')">Outside</button>
-        <button @click="spreadingCardsResp('position', player, 'x')">x</button>
+        <div v-if="drivers[playerTurn] === name">
+          <button @click="preemptPick('inside')">Inside</button>
+          <button @click="preemptPick('outside')">Outside</button>
+          <button @click="preemptPick('x')">x</button>
         </div>
         <div v-else>
           Not your turn
         </div>
       </template>
+
     </div>
 </template>
 
@@ -49,22 +51,26 @@ import {store} from '../../store'
 export default {
     name: 'SpreadingCards',
     computed: {
-        player(){
-            return store.state.playerName
+        game(){
+            return store.state.game
+        },
+        name(){
+            return store.state.name
         },
         playerTurn(){
-            return store.state.game.playerTurn
-        },
-        gameMode(){
-            return store.state.game.gameMode
+            return this.game.playerTurn
         },
         cards(){
-            return store.state.driverCards
+            let index = this.game.players.findIndex(obj => obj.name === this.name)
+            return this.game.playerCards[index]
+        },
+        drivers(){
+            return this.game.drivers
         }
     },
     methods: {
-        spreadingCardsResp: (phase, name, pick) => {
-            store.dispatch('spreadingCardsResp', {phase: phase, name: name, pick: pick})
+        preemptPick: function(pick){
+            store.dispatch('preemptPick', {name: this.name, pick: pick})
         }
     }
 }

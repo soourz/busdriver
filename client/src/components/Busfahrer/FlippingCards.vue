@@ -1,19 +1,18 @@
 <template>
     <div id="flipping-cards">
       Flipping Cards
-      {{cardTree}}<br>
+      {{ flippedCards }}<br>
       <br>
 
-      your cards: {{cards}}
+      your cards: {{ cards }}
       <br><br>
 
       <button @click="cardDeploy">I Got!</button>
-      {{ nomessage}}
 
       <div v-if="shotsToShare > 0">
-          Shot to:
+        Shot to:
         <div v-for="player in players" v-bind:key="player">
-            <button @click="shotTo(player)">{{ player }}</button>
+            <button @click="shotTo(player.name)">{{ player.name }}</button>
         </div>
       </div>
       <div v-else>
@@ -29,42 +28,55 @@ export default {
     name: 'FlippingCards',
     data: function(){
         return{
-            shotsToShare: 0,
-            nomessage: ''
+            shotsToShare: 0
         }
     },
     computed: {
+        name(){
+            return store.state.name
+        },
+        game(){
+            return store.state.game
+        },
         players(){
-            return store.state.game.players
+            return this.game.players
         },
-        player(){
-            return store.state.playerName
-        },
-        cardTree(){
-            return store.state.cardTree
+        flippedCards(){
+            return this.game.flippedCards
         },
         playerCards(){
-            return store.state.game.playerCards
-        },
-        playerIndex(){
-            return store.state.game.playerCards.findIndex(obj => obj.name === this.player)
+            return this.game.playerCards
         },
         cards(){
-            return this.playerCards[this.playerIndex]
+            let index = this.game.players.findIndex(obj => obj.name === this.name)
+            return this.game.playerCards[index]
         }
     },
     methods: {
         cardDeploy: function(){
-            if((this.cards.card1.vaue === this.cardTree[this.cardTree.length-1].card.value) ||
-            (this.cards.card2.value === this.cardTree[this.cardTree.length-1].card.vaue) || 
-            (this.cards.card3.value === this.cardTree[this.cardTree.length-1].card.value)){
-                this.shotsToShare += this.cardTree[this.cardTree.length-1].card.row
-            }else{
-                this.nomessage ='no, Idiot'
+            let lastCard = 0
+            while(this.flippedCards[lastCard+1] !== 'x'){
+                lastCard++
+            }
+            
+            let cards = this.cards
+
+            for(var i = 0; i<cards.length; i++){
+                if(cards[i].value === this.flippedCards[lastCard].value){
+                    if(lastCard < 4){
+                        this.shotsToShare += 1
+                    }else if(lastCard < 7){
+                        this.shotsToShare += 2
+                    }else if(lastCard < 9){
+                        this.shotsToShare += 3
+                    }else{
+                        this.shotsToShare += 4
+                    }
+                }
             }
         },
-        shotTo: function(name){
-            store.dispatch('shotTo', {from: this.player, to: name, count: 1})
+        shotTo: function(to){
+            store.dispatch('shotTo', {from: this.name, to: to, count: 1})
         }
     }
 }

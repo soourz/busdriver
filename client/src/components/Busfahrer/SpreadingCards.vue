@@ -7,9 +7,9 @@
       <br><br>
       <template v-if="gameMode === 'colorPick'">
         ColorPick
-        <div v-if="players[playerTurn] === player">
-          <button @click="spreadingCardsResp('color', player, 'black')">Black</button>
-          <button @click="spreadingCardsResp('color', player, 'red')">Red</button>
+        <div v-if="players[playerTurn].name === name">
+          <button @click="spreadingCardsResp('color', name, 'black')">Black</button>
+          <button @click="spreadingCardsResp('color', name, 'red')">Red</button>
         </div>
         <div v-else>
           Not your turn
@@ -18,10 +18,10 @@
 
       <template v-else-if="gameMode === 'valuePick'">
         upperlowerPick
-        <div v-if="players[playerTurn] === player">
-          <button @click="spreadingCardsResp('value', player, 'higher')">Higher</button>
-          <button @click="spreadingCardsResp('value', player, 'lower')">Lower</button>
-          <button @click="spreadingCardsResp('value', player, 'x')">X</button>
+        <div v-if="players[playerTurn].name === name">
+          <button @click="spreadingCardsResp('value', name, 'higher')">Higher</button>
+          <button @click="spreadingCardsResp('value', name, 'lower')">Lower</button>
+          <button @click="spreadingCardsResp('value', name, 'x')">X</button>
         </div>
         <div v-else>
           Not your turn
@@ -30,10 +30,10 @@
 
       <template v-else-if="gameMode === 'positionPick'">
         innerouterpick
-        <div v-if="players[playerTurn] === player">
-        <button @click="spreadingCardsResp('position', player, 'inside')">Inside</button>
-        <button @click="spreadingCardsResp('position', player, 'outisde')">Outside</button>
-        <button @click="spreadingCardsResp('position', player, 'x')">x</button>
+        <div v-if="players[playerTurn].name === name">
+        <button @click="spreadingCardsResp('position', name, 'inside')">Inside</button>
+        <button @click="spreadingCardsResp('position', name, 'outside')">Outside</button>
+        <button @click="spreadingCardsResp('position', name, 'x')">x</button>
         </div>
         <div v-else>
           Not your turn
@@ -51,8 +51,8 @@ export default {
         players(){
             return store.state.game.players
         },
-        player(){
-            return store.state.playerName
+        name(){
+            return store.state.name
         },
         playerTurn(){
             return store.state.game.playerTurn
@@ -60,11 +60,12 @@ export default {
         gameMode(){
             return store.state.game.gameMode
         },
-        playerIndex(){
-            return store.state.game.playerCards.findIndex(obj => obj.name === this.player)
+        playerCards(){
+            return store.state.game.playerCards
         },
         cards(){
-            return this.playerCards[this.playerIndex]
+            let index = this.players.findIndex(obj => obj.name === this.name)
+            return this.playerCards[index]
         }
     },
     methods: {

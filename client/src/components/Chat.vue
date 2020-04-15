@@ -2,12 +2,12 @@
   <div id="chat">
     Name: {{ name }} Room: {{ game.code }}
     <div id="players">
-      <div v-for="player in players" :key="player">
-        {{ player }}
+      <div v-for="user in users" :key="user.id">
+        {{ user.name }}
       </div>
     </div>
     <div id="messages">
-      <div v-for="messageObj in messageArray" :key="messageObj.message">
+      <div v-for="messageObj in messageArray" :key="messageObj.message + messageObj.name">
         <small>{{ messageObj.name}}:</small> {{ messageObj.message }} 
       </div>
     </div>
@@ -27,13 +27,13 @@ export default {
   name: 'Chat',
   computed: {
     name(){
-      return store.state.playerName
+      return store.state.name
     },
     messageArray(){
       return store.state.messageArray
     },
-    players(){
-      return store.state.game.players
+    users(){
+      return store.state.game.users
     },
     game(){
       return store.state.game

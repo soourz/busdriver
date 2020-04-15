@@ -10,14 +10,6 @@ import {store} from '../../store'
 
 export default {
     name: 'Preparing',
-    computed: {
-        players(){
-            return store.state.game.players
-        },
-        player(){
-            return store.state.playerName
-        },
-    },
     methods: {
         startGame: () => {
             store.dispatch('startGame')

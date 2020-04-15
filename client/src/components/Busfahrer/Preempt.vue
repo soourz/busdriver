@@ -54,6 +54,9 @@ export default {
         game(){
             return store.state.game
         },
+        innerIndex(){
+            return this.game.innerIndex
+        },
         name(){
             return store.state.name
         },

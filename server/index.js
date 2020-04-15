@@ -107,6 +107,7 @@ function startPreempt(roomIndex, drivers){
     rooms[roomIndex].gameMode = 'preempting'
     rooms[roomIndex].innerIndex = 0
     rooms[roomIndex].playerTurn = 0
+    rooms[roomIndex].preemptingRightWrong = []
     
     resetPlayerCards(roomIndex)
     resetCardStack(roomIndex)
@@ -514,28 +515,28 @@ io.on('connection', socket => {
 
     socket.on('preemptPick', data => { //data = {name: , pick: }} pick color, value or position
 
-        if(rooms[roomIndex].drivers[playerTurn].name === data.name){  //check if players turn
+        if(rooms[roomIndex].players[rooms[roomIndex].playerTurn].name === data.name){  //check if players turn
             if((rooms[roomIndex].innerIndex % 3) === 0){ //every 3 rounds starts with color again
-                preemptingRightWrong[playerTurn] = colorPick(roomIndex, name, data.pick)
+                rooms[roomIndex].preemptingRightWrong[rooms[roomIndex].playerTurn] = colorPick(roomIndex, name, data.pick)
             }else if((rooms[roomIndex].innerIndex % 3) === 1){
-                preemptingRightWrong[playerTurn] = valuePick(roomIndex, name, data.pick)
+                rooms[roomIndex].preemptingRightWrong[rooms[roomIndex].playerTurn] = valuePick(roomIndex, name, data.pick)
             }else if((rooms[roomIndex].innerIndex % 3) === 2){
-                preemptingRightWrong[playerTurn] = positionPick(roomIndex, name, data.pick)
+                rooms[roomIndex].preemptingRightWrong[rooms[roomIndex].playerTurn] = positionPick(roomIndex, name, data.pick)
             }
 
-            if((playerTurn+1) === drivers.length){ //if all drivers picked evaluate loosers
+            if((rooms[roomIndex].playerTurn+1) === rooms[roomIndex].drivers.length){ //if all drivers picked evaluate loosers
                 let driversTempSave = JSON.parse(JSON.stringify(rooms[roomIndex].drivers))
-                for(var i = 0; i<drivers.length; i++){
-                    if(preemptingRightWrong[ị]){
-                        drivers.splice(i,1)
+                for(var i = 0; i<rooms[roomIndex].drivers.length; i++){
+                    if(rooms[roomIndex].preemptingRightWrong[i]){
+                        rooms[roomIndex].drivers.splice(i,1)
                     }
                 }
     
-                if(drivers.length === 0){
-                    drivers = driversTempSave
+                if(rooms[roomIndex].drivers.length === 0){
+                    rooms[roomIndex].drivers = driversTempSave
                     rooms[roomIndex].innerIndex++
-                }else if(drivers.length === 1){
-                    startDrive(roomIndex, driver) //change to driving mode
+                }else if(rooms[roomIndex].drivers.length === 1){
+                    startDrive(roomIndex, rooms[roomIndex].drivers[0]) //change to driving mode
                 }else{
                     rooms[roomIndex].innerIndex++
                     updateGame(roomIndex)
@@ -601,5 +602,5 @@ http.listen(3000, () => {
 
     special feature... we got some shots stacked... did everybody drink? 3 players have to approve
 
-
+    check for same name
 */

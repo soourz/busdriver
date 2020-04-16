@@ -1,10 +1,24 @@
 <template>
     <div id="driving">
-    driving
+
+    drivers:
+    <div v-for="driver in drivers" :key="driver">
+        {{driver}}
+    </div>
+
     <br><br>
-    driver: {{drivers}}
-    <br><br>
-    your cards: {{cards}}
+
+    <div id="your-cards" >
+        your cards:
+        <div v-for="card in cards" :key="card" class="playingCards fourColours rotateHand">
+            <div v-if="card !== 'x'" id="card-cont">
+                <Card v-bind:value="card.value" v-bind:color="card.color" />
+            </div>
+            <div v-else>
+            </div>
+        </div>
+    </div>
+
     <br><br>
 
     <template v-if="(innerIndex % 3) === 0">
@@ -46,9 +60,13 @@
 
 <script>
 import {store} from '../../store'
+import Card from './Card.vue'
 
 export default {
     name: 'Driving',
+    components:{
+      Card
+    },
     computed: {
         game(){
             return store.state.game

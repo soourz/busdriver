@@ -1,10 +1,30 @@
 <template>
     <div id="flipping-cards">
-      Flipping Cards
-      {{ flippedCards }}<br>
-      <br>
 
-      your cards: {{ cards }}
+      <div id="flipped-cards" >
+        flipped Cards:
+        <div v-for="card in flippedCards" :key="card" class="playingCards fourColours rotateHand">
+          <div v-if="card !== 'x'" id="card-cont">
+            <Card v-bind:value="card.value" v-bind:color="card.color" />
+          </div>
+          <div v-else>
+          </div>
+        </div>
+      </div>
+      
+      <br><br>
+
+      <div id="your-cards" >
+        your cards:
+        <div v-for="card in cards" :key="card" class="playingCards fourColours rotateHand">
+          <div v-if="card !== 'x'" id="card-cont">
+            <Card v-bind:value="card.value" v-bind:color="card.color" />
+          </div>
+          <div v-else>
+          </div>
+        </div>
+      </div>
+
       <br><br>
 
       <button @click="cardDeploy">I Got!</button>
@@ -23,9 +43,13 @@
 
 <script>
 import {store} from '../../store'
+import Card from './Card.vue'
 
 export default {
     name: 'FlippingCards',
+    components:{
+      Card
+    },
     data: function(){
         return{
             shotsToShare: 0
@@ -50,7 +74,7 @@ export default {
         cards(){
             let index = this.game.players.findIndex(obj => obj.name === this.name)
             return this.game.playerCards[index]
-        }
+        },
     },
     methods: {
         cardDeploy: function(){
@@ -83,5 +107,14 @@ export default {
 </script>
 
 <style>
-
+#your-cards{
+  margin: auto;
+  height: 120px;
+  width: 210px;
+}
+#flipped-cards{
+    margin: auto;
+    height: 120px;
+    width: 750px;
+}
 </style>

@@ -32,7 +32,7 @@ import FlippingCards from '@/components/Busfahrer/FlippingCards.vue'
 import Preempt from '@/components/Busfahrer/Preempt.vue'
 import Driving from '@/components/Busfahrer/Driving.vue'
 import Result from '@/components/Busfahrer/Result.vue'
-import ShotLog from '@/components/Busfahrer/ShotLog'
+import ShotLog from '@/components/Busfahrer/ShotLog.vue'
 
 export default {
   name: 'Game',

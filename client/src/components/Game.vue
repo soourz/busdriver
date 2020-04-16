@@ -18,6 +18,8 @@
       error
     </div>
 
+    <ShotLog />
+
     <div id="action"></div>
   </div>
 </template>
@@ -30,6 +32,7 @@ import FlippingCards from '@/components/Busfahrer/FlippingCards.vue'
 import Preempt from '@/components/Busfahrer/Preempt.vue'
 import Driving from '@/components/Busfahrer/Driving.vue'
 import Result from '@/components/Busfahrer/Result.vue'
+import ShotLog from '@/components/Busfahrer/ShotLog'
 
 export default {
   name: 'Game',
@@ -39,7 +42,8 @@ export default {
     FlippingCards,
     Preempt,
     Driving,
-    Result
+    Result,
+    ShotLog
   },
   computed: {
     gameMode(){

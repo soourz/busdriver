@@ -47,7 +47,7 @@ function startFlipCards(roomIndex){  //TODO remove shit code
 
     updateGame(roomIndex)
 
-    const INTERVALL_TIME = 500
+    const INTERVALL_TIME = 3000
 
     setTimeout(() => {
         flipNewCard(roomIndex)
@@ -195,7 +195,7 @@ function valuePick(roomIndex, name, value){
             result = false
         }
     }else{
-        if(receivedCard.value = rooms[roomIndex].playerCards[playerIndex][nextCard-1].value){
+        if(receivedCard.value === rooms[roomIndex].playerCards[playerIndex][nextCard-1].value){
             result = true
         }else{
             shotTo(roomIndex, {from: 'game', to: name, count: 100})
@@ -431,7 +431,7 @@ io.on('connection', socket => {
     // GAME FEATURES
     socket.on('shotTo', data => { //data = {from: , to: , count: }
         console.log('socket shotTo')
-        shotTo({from: data.from, to: data.to, count: data.count})
+        shotTo(roomIndex, {from: data.from, to: data.to, count: data.count})
     }),
 
 
@@ -475,7 +475,7 @@ io.on('connection', socket => {
     //OUTPUT: players receive changed game object
     //(changes: gameMode, cardsLeft, playerCards, playerTurn)
 
-        positionPick(roomIndex, name, data.pick)
+        positionPick(roomIndex, name, data.position)
 
         let playerTurn = rooms[roomIndex].playerTurn // TODO: SET THIS TO BEGINNING AND REMOVE INDEXOF PLAYER
         if (rooms[roomIndex].players.length-1 > playerTurn){
@@ -492,24 +492,31 @@ io.on('connection', socket => {
     socket.on('gotFlippedCard', () => {
         let cardno
         let playerIndex = getUserIndex(roomIndex, name)
-        if(rooms[roomIndex].playerCards[playerIndex][0].value === rooms[roomIndex].flippedCards[rooms[roomIndex].flippedCards.length-1].value){
+
+        let lastFlipped = 0
+        while (rooms[roomIndex].flippedCards[lastFlipped+1] !== 'x'){
+            lastFlipped++
+        }
+
+        if(rooms[roomIndex].playerCards[playerIndex][0].value === rooms[roomIndex].flippedCards[lastFlipped].value){
             cardno = 1
             rooms[roomIndex].playerCards[playerIndex][0] = rooms[roomIndex].playerCards[playerIndex][2]
             rooms[roomIndex].playerCards[playerIndex][2] = 'x'
-        }else if(rooms[roomIndex].playerCards[playerIndex][1].value === rooms[roomIndex].flippedCards[rooms[roomIndex].flippedCards.length-1].value){
+        }else if(rooms[roomIndex].playerCards[playerIndex][1].value === rooms[roomIndex].flippedCards[lastFlipped].value){
             cardno = 2
             rooms[roomIndex].playerCards[playerIndex][1] = rooms[roomIndex].playerCards[playerIndex][2]
             rooms[roomIndex].playerCards[playerIndex][2] = 'x'
-        }else if(rooms[roomIndex].playerCards[playerIndex][2].value === rooms[roomIndex].flippedCards[rooms[roomIndex].flippedCards.length-1].value){
+        }else if(rooms[roomIndex].playerCards[playerIndex][2].value === rooms[roomIndex].flippedCards[lastFlipped].value){
             cardno = 3
             rooms[roomIndex].playerCards[playerIndex][2] = 'x'
         }else{
             cardno = 0
             //TODO WRONG CALL RESPONSE
         }
+        updateGame(roomIndex)
         
         if( cardno > 0){
-            socket.emit('distributeShots', rooms[roomIndex].flippedCards[rooms[roomIndex].flippedCards.length-1].row) //IMPL
+            //TODO player shots to share ++
         }
     }),
 
@@ -594,6 +601,21 @@ http.listen(3000, () => {
 
 
 /*
+    move shotstoshare logic from frontend to solely backend
+
+    i got is not working properly
+
+    had the same card twice on spreading cards... how?
+
+    check requests like got flipped card on frontend and backend or only backend?
+
+    send prefiltered data or the full game? in which case what?
+    when using prefiltered data... how avoid having 100 send and receive methods?
+
+    keep all data or overwrite like playercards?
+    if keep, how prevent that game has too many properties?
+
+
     split backend into multiple files
 
     vue create asked for use history mode for router... (requires proper server setup for index fallback in production)

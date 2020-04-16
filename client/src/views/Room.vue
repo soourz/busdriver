@@ -1,7 +1,7 @@
 <template>
   <div class="room">
     <Chat id="chat" />
-    <Game />
+    <Game id="game" />
   </div>
 </template>
 
@@ -21,6 +21,9 @@ export default {
 
 <style scoped>
 #chat{
+  margin: auto
+}
+#game{
   margin: auto
 }
 </style>

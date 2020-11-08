@@ -61,58 +61,28 @@ function startFlipCards(roomIndex){  //TODO remove shit code
     updateGame(roomIndex)
 
     const INTERVALL_TIME = 3000
+    var INTERVALL_COUNT = 0
 
-    setTimeout(() => {
-        flipNewCard(roomIndex)
-        updateGame(roomIndex)
-    },INTERVALL_TIME)
+    interval = setInterval(() => {
 
-    setTimeout(() => {
-        flipNewCard(roomIndex)
-        updateGame(roomIndex)
-    },INTERVALL_TIME*2)
+        if (INTERVALL_COUNT == 10){
+            clearInterval(interval)
+            rooms[roomIndex].drivers = getDrivers(roomIndex)
 
-    setTimeout(() => {
-        flipNewCard(roomIndex)
-        updateGame(roomIndex)
-    },INTERVALL_TIME*3)
-    setTimeout(() => {
-        flipNewCard(roomIndex)
-        updateGame(roomIndex)
-    },INTERVALL_TIME*4)
-    setTimeout(() => {
-        flipNewCard(roomIndex)
-        updateGame(roomIndex)
-    },INTERVALL_TIME*5)
-    setTimeout(() => {
-        flipNewCard(roomIndex)
-        updateGame(roomIndex)
-    },INTERVALL_TIME*6)
-    setTimeout(() => {
-        flipNewCard(roomIndex)
-        updateGame(roomIndex)
-    },INTERVALL_TIME*7)
-    setTimeout(() => {
-        flipNewCard(roomIndex)
-        updateGame(roomIndex)
-    },INTERVALL_TIME*8)
-    setTimeout(() => {
-        flipNewCard(roomIndex)
-        updateGame(roomIndex)
-    },INTERVALL_TIME*9)
-    setTimeout(() => {
-        flipNewCard(roomIndex)
-        updateGame(roomIndex)
-    },INTERVALL_TIME*10)
-    setTimeout(() => {
-        rooms[roomIndex].drivers = getDrivers(roomIndex)
-
-        if (rooms[roomIndex].drivers.length === 1){
-            startDrive(roomIndex, rooms[roomIndex].drivers)
+            if (rooms[roomIndex].drivers.length === 1) {
+                startDrive(roomIndex, rooms[roomIndex].drivers)
+            } else {
+                startPreempt(roomIndex, rooms[roomIndex].drivers)
+            }
         }else{
-            startPreempt(roomIndex, rooms[roomIndex].drivers)
+            flipNewCard(roomIndex)
+            updateGame(roomIndex)
+            INTERVALL_COUNT++
         }
-    },INTERVALL_TIME*11)
+        
+    }, INTERVALL_TIME);
+
+   
 }
 
 function startPreempt(roomIndex, drivers){

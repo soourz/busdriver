@@ -102,5 +102,5 @@ export default {
 #card-cont{
   float:left
 }
-  @import '../../assets/CSS-Playing-Cards/cards.css';
+  @import '../../assets/cards/cards.css';
 </style>

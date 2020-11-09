@@ -83,7 +83,7 @@ function startFlipCards(roomIndex){  //TODO remove shit code
     }, INTERVALL_TIME);
 
    
-}
+};
 
 function startPreempt(roomIndex, drivers){
     console.log('startPreempt')

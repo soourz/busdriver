@@ -81,8 +81,6 @@ function startFlipCards(roomIndex){  //TODO remove shit code
         }
         
     }, INTERVALL_TIME);
-
-   
 }
 
 function startPreempt(roomIndex, drivers){
@@ -108,18 +106,6 @@ function startDrive(roomIndex){
 
     updateGame(roomIndex)
 }
-
-
-// GAME PICKS
-// function cardPick(roomIndex, name, pick){
-//     if (innerIndex === 0){
-
-//     }else if(innerIndex === 1){
-
-//     }else if(innerIndex === 2){
-
-//     }
-// }
 
 function colorPick(roomIndex, name, color){
     console.log('colorPick')
@@ -581,31 +567,3 @@ io.on('connection', socket => {
 http.listen(3000, () => {
     console.log('listening at :3000 ...')
 })
-
-
-/*
-    move shotstoshare logic from frontend to solely backend
-
-    i got is not working properly
-
-    had the same card twice on spreading cards... how?
-
-    check requests like got flipped card on frontend and backend or only backend?
-
-    send prefiltered data or the full game? in which case what?
-    when using prefiltered data... how avoid having 100 send and receive methods?
-
-    keep all data or overwrite like playercards?
-    if keep, how prevent that game has too many properties?
-
-
-    split backend into multiple files
-
-    vue create asked for use history mode for router... (requires proper server setup for index fallback in production)
-
-    only accept socket calls if its the callers turn and the right game mode
-
-    special feature... we got some shots stacked... did everybody drink? 3 players have to approve
-
-    check for same name
-*/

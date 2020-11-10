@@ -6,6 +6,7 @@ A simple card game.
 
 Prerequisits
 
+node and npm installed
 
 Preparation
 

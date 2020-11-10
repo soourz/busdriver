@@ -4,6 +4,9 @@ A simple card game.
 
 ## Run locally
 
+Prerequisits
+
+
 Preparation
 
 1. Clone repository

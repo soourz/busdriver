@@ -19,4 +19,4 @@ Start local server
 8. Enter server folder
 9. run "npm start"
 
-Now you can access the game on http://localhost:8080/
+Now you can access the game at http://localhost:8080/

@@ -2,6 +2,7 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Home from '../views/Home.vue'
 import Room from '../views/Room.vue'
+import Design from '../views/Design.vue'
 import {store} from '../store'
 
 Vue.use(VueRouter)
@@ -12,14 +13,18 @@ Vue.use(VueRouter)
     name: 'Home',
     component: Home,
     meta: {
-      public: true,
-      onlyWhenOutGame: true
+      public: true
     }
   },
   {
     path: '/room',
     name: 'Room',
     component: Room
+  },
+  {
+    path: '/design',
+    name: 'Design',
+    component: Design
   }
 ]
 
@@ -30,20 +35,23 @@ const router = new VueRouter({
 })
 
 router.beforeEach((to, from, next) => {
+
+  if(to.name === "Design"){
+    return next()
+  }
+
+
   const isPublic = to.matched.some(record => record.meta.public)
-  const onlyWhenOutGame = to.matched.some(record => record.meta.onlyWhenOutGame)
   
   var loggedIn = store.getters.getInGame
 
   if(!isPublic && !loggedIn){
     return next('/')
   }
-  console.log(loggedIn)
 
-  if(loggedIn && onlyWhenOutGame){
-    return next('/room')
+  if(isPublic && loggedIn){
+    return next(false)
   }
-  console.log(loggedIn)
 
   next();
 })

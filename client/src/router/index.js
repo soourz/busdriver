@@ -29,21 +29,19 @@ const router = new VueRouter({
   routes
 })
 
+
 router.beforeEach((to, from, next) => {
   const isPublic = to.matched.some(record => record.meta.public)
-  const onlyWhenOutGame = to.matched.some(record => record.meta.onlyWhenOutGame)
   
   var loggedIn = store.getters.getInGame
 
   if(!isPublic && !loggedIn){
     return next('/')
   }
-  console.log(loggedIn)
 
-  if(loggedIn && onlyWhenOutGame){
-    return next('/room')
+  if(isPublic && loggedIn){
+    return next
   }
-  console.log(loggedIn)
 
   next();
 })

@@ -1,14 +1,12 @@
 <template>
-
-
-<div>
-          <div id="card-cont" class="playingCards fourColours rotateHand">
-              <div class="card" :class="'rank-'+value+' '+color">
-                <span class="rank">{{value}}</span>
-                <span class="suit" v-html="'&'+color+';'"></span>
+  <div>
+            <div id="card-cont" class="playingCards fourColours rotateHand">
+                <div class="card" :class="'rank-'+value+' '+color">
+                  <span class="rank">{{value}}</span>
+                  <span class="suit" v-html="'&'+color+';'"></span>
+                </div>
               </div>
-            </div>
- </div>
+  </div>
 </template>
 
 <script>

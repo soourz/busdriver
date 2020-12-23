@@ -1,55 +1,36 @@
-var mongoose = require('mongoose');
-var room = require('../models/roomModel')
+const room = require('../models/roomModel');
 
-exports.getRoom = (id) => {
-    room.findById(id, (err, note) => {
-        if (err) {
-        }
-        return note;
+exports.getRooms = async (filter) => {
+    return await room.find(filter).populate('users') //populate replaces user ids with the actual user objects... help: https://dev.to/paras594/how-to-use-populate-in-mongoose-node-js-mo0
+    .then(rooms => {
+        return rooms;
+    })
+    .catch(err => {
+        console.log(err);
+        return -1;
     });
 };
 
-// getAllRooms = (req, res) => {
-//     note.find({}, (err, notes) => {
-//         if (err) {
-//             res.send(err);
-//         }
-
-//         res.json(notes);
-//     });
-// };
-
-exports.createRoom = (data, callback) => {
+exports.createRoom = async (data) => {
     const newRoom = new room(data);
-    newRoom.save()
+    return await newRoom.save()
     .then(room => {
-        callback(room.id)
-    }); //implement catch
+        return room.id;
+    })
+    .catch(err => {
+        console.log(err);
+        return -1;
+    });
 };
 
-// updateRoom = (req, res) => {
-//     note.findOneAndUpdate({
-//         _id: req.params.noteId
-//      }, req.body,
-//         (err, note) => {
-//             if (err) {
-//                 res.send(err);
-//             }
+exports.updateRoom = async (id, data) => {
+    await room.findOneAndUpdate( {_id: id }, data, { new: true, useFindAndModify: false });
+};
 
-//             res.json(note);
-//         });
-// };
+exports.deleteRoom = async (id) => {
+     await room.deleteOne({ _id: id });
+};
 
-// deleteRoom = (req, res) => {
-//     note.remove({
-//         _id: req.params.noteId
-//     }, (err) => {
-//         if (err) {
-//             res.send(err);
-//         }
-
-//         res.json({
-//             message: `note ${req.params.noteId} successfully deleted`
-//         });
-//     });
-// };
+exports.deleteAllRooms = async () => {
+    await room.deleteMany({});
+};

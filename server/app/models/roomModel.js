@@ -1,10 +1,11 @@
-var mongoose = require('mongoose');
+const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
 
-const RoomSchema = new mongoose.Schema({
+const RoomSchema = new Schema({
     code: {type: String, required: true},
-    users: {type: Schema.Types.ObjectId, ref: 'User'},
- //   game: {type: Schema.Types.ObjectId, ref: 'Game'},
- //   roomMode: {type: String, enum: ['lobby', 'inGame', ]}
+    roomMode: {type: String, required: true, enum: ['waiting', 'playing']},
+    users: [{type: Schema.Types.ObjectId, ref: 'User'}],
+ //   game: {type: Schema.Types.ObjectId, ref: 'Game'}
 });
 
 module.exports = mongoose.model('Room', RoomSchema);

@@ -1,6 +1,9 @@
 const express = require('express')()
 const http = require('http').Server(express)
 const io = require('socket.io')(http)
+const room = require('./app/controllers/roomController.js')
+const user = require('./app/controllers/userController.js')
+const cards = require('./app/controllers/cardController.js')
 
 //Import the mongoose module
 var mongoose = require('mongoose');
@@ -16,7 +19,29 @@ var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 
 
-// CONSTANTS
+let roomid;
+
+//room.createRoom({code:'asdf', roomMode: 'lobby'}, id => {
+//    roomid = id;
+//    console.log(roomid);
+//});
+async function myFunc () {
+
+//    await room.updateRoom({id:'5fe113590183d51dec2c7ea9', roomMode: 'inGame'});
+    //roomid = await room.createRoom({code:'hi', roomMode: 'waiting'})
+
+//    let userId = await user.createUser({name: 'tom'});
+//    let rooma = await room.createRoom({code: 'asdf', roomMode: 'waiting', users: [userId]});
+//    console.log(rooma);
+    rooms = await room.getRooms({})
+    console.log(rooms[1]);
+};
+
+//   await room.getAllRooms((rooms) => {
+//      console.log(rooms);
+//  });
+
+console.log(cards.getNewStack())
 const CARDS = [{color: 'heart', value: 7},{color: 'heart', value: 8},{color: 'heart', value: 9},{color: 'heart', value: 10},{color: 'heart', value: 11},{color: 'heart', value: 12},{color: 'heart', value: 13},{color: 'heart', value: 14},{color: 'pik', value: 7},{color: 'pik', value: 8},{color: 'pik', value: 9},{color: 'pik', value: 10},{color: 'pik', value: 11},{color: 'pik', value: 12},{color: 'pik', value: 13},{color: 'pik', value: 14},{color: 'cross', value: 7},{color: 'cross', value: 8},{color: 'cross', value: 9},{color: 'cross', value: 10},{color: 'cross', value: 11},{color: 'cross', value: 12},{color: 'cross', value: 13},{color: 'cross', value: 14},{color: 'caro', value: 7},{color: 'caro', value: 8},{color: 'caro', value: 9},{color: 'caro', value: 10},{color: 'caro', value: 11},{color: 'caro', value: 12},{color: 'caro', value: 13},{color: 'caro', value: 14}]
 
 
